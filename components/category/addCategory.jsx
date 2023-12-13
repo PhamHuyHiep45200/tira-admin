@@ -23,7 +23,7 @@ function AddUser({ open, refresh, closeAdd }) {
     >
       <Form onFinish={submit} layout="vertical" form={form}>
         <Form.Item
-          label="Tên hãng"
+          label="Tên Thể Loại"
           name="name"
           rules={[{ required: true, message: "Không được bỏ trống!" }]}
         >
