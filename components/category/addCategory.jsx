@@ -34,7 +34,7 @@ function AddUser({ open, refresh, closeAdd }) {
           name="image"
           rules={[{ required: true, message: "Không được bỏ trống!" }]}
         >
-          <UploadFile/>
+          <UploadFile />
         </Form.Item>
         <div>
           <Button htmlType="submit" className="w-full" size="large">
