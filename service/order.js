@@ -1,29 +1,16 @@
 import request from ".";
 
-export async function getAllUser() {
-  return request(`/user/all`, {
+export async function getAllOrder() {
+  return request(`/order`, {
     method: "GET",
   });
 }
-export async function getUserById(id) {
-  return request(`/user/${id}`, {
-    method: "GET",
-  });
-}
-export async function createUser(data) {
-  return request(`/user/create`, {
+
+export async function cancelOrder(id) {
+  return request(`/order/update/${id}`, {
     method: "POST",
-    data,
-  });
-}
-export async function updateUser(id, data) {
-  return request(`/user/update/${id}`, {
-    method: "PUT",
-    data,
-  });
-}
-export async function deleteUser(id) {
-  return request(`/user/delete/${id}`, {
-    method: "DELETE",
+    data: {
+      status: 5
+    }
   });
 }

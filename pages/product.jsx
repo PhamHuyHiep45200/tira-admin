@@ -2,9 +2,14 @@ import ProductApprove from "@/components/post/ProductApprove";
 import ProductApproved from "@/components/post/ProductApproved";
 import ProductCancle from "@/components/post/ProductCancle";
 import { Tabs, Tag } from "antd";
-import React from "react";
+import React, { useState } from "react";
 
-function product() {
+function Product() {
+  const [checkCall, setCheckCall] = useState(Math.random())
+
+  const resetData = ()=>{
+    setCheckCall(Math.random())
+  }
   const onChange = (key) => {
     console.log(key);
   };
@@ -13,17 +18,17 @@ function product() {
     {
       key: "1",
       label: <Tag color="green">Tất Cả Sản Phẩm</Tag>,
-      children: <ProductApproved />,
+      children: <ProductApproved checkCall={checkCall} />,
     },
     {
       key: "2",
       label: <Tag color="blue">Sản Phẩm Đợi Duyệt</Tag>,
-      children: <ProductApprove />,
+      children: <ProductApprove checkCall={checkCall} resetData={resetData} />,
     },
     {
       key: "3",
       label: <Tag color="red">Sản Phẩm Huỷ Bỏ</Tag>,
-      children: <ProductCancle />,
+      children: <ProductCancle checkCall={checkCall} />,
     },
   ];
   return (
@@ -36,4 +41,4 @@ function product() {
   );
 }
 
-export default product;
+export default Product;

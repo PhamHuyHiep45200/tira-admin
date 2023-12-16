@@ -70,11 +70,11 @@ function LayoutMain({ children }) {
       icon: <UsergroupAddOutlined />,
       label: "Đơn hàng",
     },
-    {
-      key: "/banner",
-      icon: <UsergroupAddOutlined />,
-      label: "Banner",
-    },
+    // {
+    //   key: "/banner",
+    //   icon: <UsergroupAddOutlined />,
+    //   label: "Banner",
+    // },
   ];
   useEffect(() => {
     if (!user) {

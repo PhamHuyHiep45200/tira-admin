@@ -5,7 +5,7 @@ import { Button, Image, Pagination, Table } from "antd";
 import { useRouter } from "next/router";
 import { PRODUCT_STATUS } from "@/enum/product.enum";
 
-function ProductCancle() {
+function ProductCancle({checkCall}) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const router = useRouter();
@@ -15,7 +15,7 @@ function ProductCancle() {
     limit: 10,
   });
 
-  const getAllCart = async () => {
+  const getAllProductCancle = async () => {
     setLoading(true);
     try {
       const { products } = await getAllProduct({
@@ -40,8 +40,8 @@ function ProductCancle() {
     }
   };
   useEffect(() => {
-    getAllCart();
-  }, [pagination.page]);
+    getAllProductCancle();
+  }, [pagination.page, checkCall]);
   const columns = useMemo(() => {
     return [
       {

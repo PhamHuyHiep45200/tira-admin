@@ -5,7 +5,7 @@ import { Button, Image, Pagination, Table } from "antd";
 import { useRouter } from "next/router";
 import { PRODUCT_STATUS } from "@/enum/product.enum";
 
-function ProductApprove() {
+function ProductApprove({checkCall,resetData}) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -31,13 +31,14 @@ function ProductApprove() {
         status,
         products: selectedRowKeys,
       });
-      getAllCart();
+      getAllProductAprove();
+      resetData()
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getAllCart = async () => {
+  const getAllProductAprove = async () => {
     setLoading(true);
     try {
       const { products } = await getAllProduct({
@@ -62,8 +63,8 @@ function ProductApprove() {
     }
   };
   useEffect(() => {
-    getAllCart();
-  }, [pagination.page]);
+    getAllProductAprove();
+  }, [pagination.page, checkCall]);
   const columns = useMemo(() => {
     return [
       {
