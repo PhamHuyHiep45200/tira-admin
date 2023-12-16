@@ -31,7 +31,7 @@ function Category() {
           <Image
             width={60}
             height={40}
-            src={e.image.split('http://localhost:8080')[1]}
+            src={e?.image?.split(process.env.NEXT_PUBLIC_BASE_URL_SERVER)?.[1]??''}
             alt=""
           />
         </div>
