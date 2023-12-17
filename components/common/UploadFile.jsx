@@ -1,4 +1,5 @@
 import { uploadFile } from "@/service/upload";
+import { getImage } from "@/utils/image";
 import { Upload } from "antd";
 import React, { useEffect, useState } from "react";
 
@@ -10,8 +11,8 @@ function UploadFile({ value, onChange, type }) {
     formData.append("image", e.file.originFileObj);
     const response = await uploadFile(formData);
     const url = `${response.path_image}/${response.image}`
-    setImageUrl(url);
-    onChange?.(url);
+    setImageUrl(getImage(url));
+    onChange?.(getImage(url));
   };
   useEffect(() => {
     if (value) {

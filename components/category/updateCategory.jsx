@@ -28,7 +28,7 @@ function UpdateUser({ open, refresh, closeAdd, data }) {
   }, [data]);
   return (
     <Modal
-      title="Sửa Người Dùng"
+      title="Sửa Thể Loại"
       open={open}
       onCancel={onCloseAdd}
       footer={false}

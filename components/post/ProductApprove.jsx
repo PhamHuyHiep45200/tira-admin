@@ -72,7 +72,7 @@ function ProductApprove({checkCall,resetData}) {
         render: (_, record) => (
           <div className="flex items-center space-x-4">
             <Image
-              src={JSON.parse(record?.image)[0]}
+              src={record.image_master}
               alt=""
               className="max-w-[100px] min-w-[100px] min-h-[100px] max-h-[100px] rounded-[6px]"
             />

@@ -16,7 +16,7 @@ function AddUser({ open, refresh, closeAdd }) {
   };
   return (
     <Modal
-      title="Tạo Hãng xe"
+      title="Tạo Thể Loại"
       open={open}
       onCancel={onCloseAdd}
       footer={false}
