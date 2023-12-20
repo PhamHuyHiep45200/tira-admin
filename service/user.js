@@ -25,7 +25,7 @@ export async function createUser(data) {
 }
 export async function updateUser(id, data) {
   return request(`/user/update/${id}`, {
-    method: "PUT",
+    method: "POST",
     data,
   });
 }

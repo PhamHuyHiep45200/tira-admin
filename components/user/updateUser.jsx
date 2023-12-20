@@ -17,6 +17,7 @@ function UpdateUser({ open, refresh, closeAdd, data }) {
   };
   const onCloseAdd = () => {
     closeAdd();
+    form.resetFields();
   };
   useEffect(() => {
     if (data) {
