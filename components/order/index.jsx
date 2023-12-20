@@ -5,6 +5,7 @@ import moment from "moment/moment";
 import { Tag } from "antd";
 import {
   KIND_PAYPAL,
+  STATUS_CANCEL,
   STATUS_ORDERED,
   StatusOrder,
   StatusTextOrder,
@@ -77,9 +78,9 @@ function Order() {
             >
               Xem Chi Tiết
             </Button>
-            <Button danger onClick={() => handleCancle(e.id)}>
+            {e.status === STATUS_ORDERED && <Button danger onClick={() => handleCancle(e.id)}>
               Huỷ
-            </Button>
+            </Button>}
           </div>
         ),
       },

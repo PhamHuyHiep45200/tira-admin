@@ -11,38 +11,14 @@ import React, { useContext, useEffect } from "react";
 
 const { Sider, Content } = Layout;
 function LayoutMain({ children }) {
-  const { noti, user } = useContext(CreateContext);
+  const { noti, user, logout } = useContext(CreateContext);
   const router = useRouter();
   const changeMenu = (e) => {
-    router.push(e.key);
-  };
-  const content = () => {
-    return (
-      <div>
-        {noti.length &&
-          noti.map((e) => (
-            <div
-              key={e.id}
-              className="my-[10px] flex border-b-[1px] border-[#eaeaea] max-w-[300px] space-x-[10px] max-h-[500px] overflow-y-auto"
-            >
-              <div>
-                <Avatar>{e.UserReceiverOrder.name[0]}</Avatar>
-              </div>
-              <div className="text-[#777]">
-                <span className="font-bold text-[black]">
-                  {e.UserReceiverOrder.name}
-                </span>{" "}
-                đã thuê xe{" "}
-                <span className="text-medium text-[red]">
-                  {e.motoOrder.name}
-                </span>{" "}
-                vào lúc {moment(e.createdAt).format("HH:mm")} phút{" "}
-                {moment(e.createdAt).format("DD-MM-YYYY")}
-              </div>
-            </div>
-          ))}
-      </div>
-    );
+    if(e.key === '/login') {
+      logout()
+    } else {
+      router.push(e.key);
+    }
   };
   const itemsLayout = [
     {
@@ -69,6 +45,11 @@ function LayoutMain({ children }) {
       key: "/order",
       icon: <UsergroupAddOutlined />,
       label: "Đơn hàng",
+    },
+    {
+      key: "/login",
+      icon: <UsergroupAddOutlined />,
+      label: "Đăng Xuất",
     },
     // {
     //   key: "/banner",

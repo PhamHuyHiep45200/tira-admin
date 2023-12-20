@@ -5,15 +5,20 @@ import { Button, Image, Pagination, Table } from "antd";
 import { useRouter } from "next/router";
 import { PRODUCT_STATUS } from "@/enum/product.enum";
 
-function ProductApproved({checkCall}) {
+function ProductApproved({ checkCall, resetData }) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const router = useRouter();
   const [pagination, setPagination] = useState({
     page: 1,
     total: 0,
     limit: 10,
   });
+
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
 
   const changeStatusProducts = async (status) => {
     try {
@@ -22,6 +27,7 @@ function ProductApproved({checkCall}) {
         products: selectedRowKeys,
       });
       getAllCartProductAproved();
+      resetData()
     } catch (error) {
       console.log(error);
     }
@@ -77,7 +83,12 @@ function ProductApproved({checkCall}) {
       },
       {
         title: "Chi tiết",
-        render: (_, record) => <div className="max-w-[200px] max-h-[100px] overflow-auto" dangerouslySetInnerHTML={{ __html: record.description }} />,
+        render: (_, record) => (
+          <div
+            className="max-w-[200px] max-h-[100px] overflow-auto"
+            dangerouslySetInnerHTML={{ __html: record.description }}
+          />
+        ),
       },
       {
         title: "Đơn Giá",
@@ -87,7 +98,7 @@ function ProductApproved({checkCall}) {
         title: "Số Lượng",
         align: "center",
         dataIndex: "quantity",
-      }
+      },
     ];
   }, []);
   const changePaginate = (e) => {
@@ -96,12 +107,27 @@ function ProductApproved({checkCall}) {
       page: e,
     });
   };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
   return (
     <div>
+      <div className="flex justify-end mb-5">
+        <Button
+          danger
+          onClick={() => changeStatusProducts(PRODUCT_STATUS.UN_APPROVE)}
+        >
+          Gỡ sản phẩm
+        </Button>
+      </div>
       <Table
         columns={columns}
         dataSource={data}
         pagination={false}
+        rowSelection={rowSelection}
       />
       <div className="text-center mt-5">
         <Pagination

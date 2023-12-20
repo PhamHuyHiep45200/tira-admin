@@ -68,8 +68,8 @@ function UpdateUser({ open, refresh, closeAdd, data }) {
           <Select
             size="large"
             options={[
-              { value: "USER", label: "client" },
-              { value: "ADMIN", label: "admin" },
+              { value: "client", label: "USER" },
+              { value: "admin", label: "ADMIN" },
             ]}
           />
         </Form.Item>

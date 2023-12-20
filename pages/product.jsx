@@ -18,7 +18,7 @@ function Product() {
     {
       key: "1",
       label: <Tag color="green">Tất Cả Sản Phẩm</Tag>,
-      children: <ProductApproved checkCall={checkCall} />,
+      children: <ProductApproved checkCall={checkCall} resetData={resetData} />,
     },
     {
       key: "2",

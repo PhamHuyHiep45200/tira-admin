@@ -3,10 +3,10 @@ import { CreateContext } from "@/context/ContextProviderGlobal";
 import { loginUser } from "@/service/auth";
 import { Button, Form, Input } from "antd";
 import { useRouter } from "next/router";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 function Login() {
-  const { errorNoti, userAuth } = useContext(CreateContext);
+  const { errorNoti, userAuth, user } = useContext(CreateContext);
   const router = useRouter();
   const redirectRegister = (path) => {
     router.push("/register");
@@ -20,6 +20,11 @@ function Login() {
       errorNoti('Đã có lỗi xảy ra');
     }
   };
+  useEffect(()=>{
+    if (user) {
+      router.push("/");
+    }
+  },[user])
   return (
     <div>
       <div className="my-5 font-[500] text-center text-[30px]">Login</div>

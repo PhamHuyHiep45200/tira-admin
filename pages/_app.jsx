@@ -26,7 +26,7 @@ function MyApp({ Component, pageProps }) {
     };
   }, [router, router.events]);
   useEffect(() => {
-    if (auth || localStorage.getItem("token")) {
+    if (auth || localStorage.getItem("token_admin")) {
       getMe();
     } else {
       setUser(null);
@@ -50,9 +50,6 @@ function MyApp({ Component, pageProps }) {
     try {
       const { user } = await userGetMe();
       setUser(user);
-      if (user) {
-        router.push("/");
-      }
     } catch (error) {
       console.log(error);
     }
@@ -71,9 +68,17 @@ function MyApp({ Component, pageProps }) {
   const loadingEnd = () => {
     setLoading(false);
   };
+
+  const logout = () => {
+    localStorage.removeItem('token_admin')
+    setUser(null)
+    userAuth(false)
+    router.push('/login')
+  }
   const data = {
     user,
     successNoti,
+    logout,
     errorNoti,
     setAuth,
     setUserData,
