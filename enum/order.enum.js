@@ -4,11 +4,11 @@ export const KIND_PAYPAL = 2; // thanh toán ol
 
 export const STATUS_ORDERED = 1; // đã đặt hàng nhưng chưa thanh toán
 
-export const STATUS_DELIVERING = 2; // đang giao
+export const STATUS_DELIVERING = 2; // đang giao (không làm đến phần này)
 
 export const STATUS_PAYMENT_SUCCESS = 3; // thanh toán thành công
 
-export const STATUS_SUCCESS = 4; // giao hàng thành công
+export const STATUS_SUCCESS = 4; // giao hàng thành công (không làm đến phần này)
 
 export const STATUS_CANCEL = 5; // huỷ
 
