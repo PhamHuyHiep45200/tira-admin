@@ -4,7 +4,7 @@ import {
   BellOutlined,
   UsergroupAddOutlined,
 } from "@ant-design/icons";
-import { Avatar, Badge, Layout, Menu, Popover } from "antd";
+import { Avatar, Badge, Image, Layout, Menu } from "antd";
 import moment from "moment";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect } from "react";
@@ -35,6 +35,11 @@ function LayoutMain({ children }) {
       key: "/category",
       icon: <UsergroupAddOutlined />,
       label: "Thể Loại",
+    },
+    {
+      key: "/collection",
+      icon: <UsergroupAddOutlined />,
+      label: "Bộ Sưu Tập",
     },
     {
       key: "/product",
@@ -74,6 +79,7 @@ function LayoutMain({ children }) {
           console.log(collapsed, type);
         }}
       >
+        <Image alt="" src="/logo.png" preview={false} />
         <div className="demo-logo-vertical" />
         <Menu
           theme="dark"

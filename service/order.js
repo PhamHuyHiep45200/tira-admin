@@ -6,11 +6,11 @@ export async function getAllOrder() {
   });
 }
 
-export async function cancelOrder(id) {
+export async function changeStatusOrder(id, status) {
   return request(`/order/update/${id}`, {
     method: "POST",
     data: {
-      status: 5
+      status
     }
   });
 }

@@ -1,12 +1,14 @@
 import { Button, Drawer, Image, Table } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
-import { cancelOrder, getAllOrder, updateOrder } from "@/service/order";
+import { changeStatusOrder, getAllOrder } from "@/service/order";
 import moment from "moment/moment";
 import { Tag } from "antd";
 import {
   KIND_PAYPAL,
   STATUS_CANCEL,
   STATUS_ORDERED,
+  STATUS_PAYMENT_SUCCESS,
+  STATUS_SUCCESS,
   StatusOrder,
   StatusTextOrder,
 } from "@/enum/order.enum";
@@ -78,9 +80,16 @@ function Order() {
             >
               Xem Chi Tiết
             </Button>
-            {e.status === STATUS_ORDERED && <Button danger onClick={() => handleCancle(e.id)}>
-              Huỷ
-            </Button>}
+            {e.status === STATUS_PAYMENT_SUCCESS && (
+              <Button onClick={() => handleConfirmShip(e.id)}>
+                Xác nhận giao hàng
+              </Button>
+            )}
+            {e.status === STATUS_ORDERED && (
+              <Button danger onClick={() => handleCancle(e.id)}>
+                Huỷ
+              </Button>
+            )}
           </div>
         ),
       },
@@ -140,7 +149,16 @@ function Order() {
   };
   const handleCancle = async (id) => {
     try {
-      await cancelOrder(id);
+      await changeStatusOrder(id, STATUS_CANCEL);
+      getAll();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleConfirmShip = async (id) => {
+    try {
+      await changeStatusOrder(id, STATUS_SUCCESS);
       getAll();
     } catch (error) {
       console.log(error);
