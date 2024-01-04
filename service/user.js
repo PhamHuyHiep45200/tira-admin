@@ -34,3 +34,9 @@ export async function deleteUser(id) {
     method: "DELETE",
   });
 }
+
+export async function statistics() {
+  return request(`/statistics/statistics`, {
+    method: "GET",
+  });
+}
