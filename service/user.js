@@ -41,3 +41,16 @@ export async function statistics(params) {
     params
   });
 }
+
+export async function statisticsProduct(params) {
+  return request(`/statistics/product`, {
+    method: "GET",
+    params
+  });
+}
+
+export async function statisticsCategory() {
+  return request(`/statistics/category`, {
+    method: "GET",
+  });
+}

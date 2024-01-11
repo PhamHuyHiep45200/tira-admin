@@ -5,19 +5,24 @@ import {
   STATUS_PAYMENT_SUCCESS,
   STATUS_SUCCESS,
 } from "@/enum/order.enum";
-import { statistics } from "@/service/user";
+import {
+  statistics,
+  statisticsCategory,
+  statisticsProduct,
+} from "@/service/user";
 import {
   Button,
   Col,
   DatePicker,
   Divider,
   Form,
+  Image,
   Row,
   Select,
   Space,
+  Table,
 } from "antd";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -28,13 +33,13 @@ import {
   Legend,
   Pie,
   PieChart,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-import dayjs from 'dayjs'
+import dayjs from "dayjs";
+import { formatMoney } from "@/utils/common";
 
 const { RangePicker } = DatePicker;
 
@@ -143,28 +148,69 @@ const data = [
 ];
 export default function Home() {
   const [form] = Form.useForm();
+  const [formFilterProduct] = Form.useForm();
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState();
   const [orderFilter, setOrderFilter] = useState();
   const [product, setProduct] = useState();
+  const [statiticCateories, setStatiticCateories] = useState([]);
+  const [statiticProduct, setStatiticProduct] = useState([]);
   const [typeDate, setTypeDate] = useState("day");
   const [dataSort, setDataSort] = useState({
-    filter: 'day',
-    startTime: undefined,
-    endTime: undefined,
+    filter: "day",
+    start_date: dayjs().subtract(1, "month").format("YYYY-MM-DD"),
+    end_date: dayjs().format("YYYY-MM-DD"),
     status: undefined,
-  })
+  });
 
   useEffect(() => {
     getStatistics();
+  }, [dataSort]);
+
+  useEffect(() => {
     form.setFieldsValue({
       typeDate: "day",
+      date: [dayjs().subtract(1, "month"), dayjs()]
     });
-  }, [dataSort]);
+    formFilterProduct.setFieldValue("date", [
+      dayjs().subtract(1, "month"),
+      dayjs(),
+    ]);
+    statiticCateoryData();
+    statiticProductData({
+      start_date: dayjs().subtract(1, "month").format("YYYY-MM-DD"),
+      end_date: dayjs().format("YYYY-MM-DD"),
+    });
+  }, []);
+
+  const statiticCateoryData = async () => {
+    try {
+      const res = await statisticsCategory();
+      setStatiticCateories(
+        res.map((e) => ({
+          name: e.name,
+          quantity: +e.total_quantity,
+        }))
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const statiticProductData = async (params) => {
+    try {
+      const res = await statisticsProduct(params);
+      setStatiticProduct(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getStatistics = async () => {
     try {
-      const { orderCount, orderFilter, productCount } = await statistics(dataSort);
+      const { orderCount, orderFilter, productCount } = await statistics(
+        dataSort
+      );
       setOrder(
         Object.entries(orderCount).map((e) => ({
           name: e[0],
@@ -193,43 +239,92 @@ export default function Home() {
   const onValuesChange = (e, a) => {
     if (Object.keys(e)[0] === "typeDate") {
       setTypeDate(e.typeDate);
-      form.setFieldValue('date', undefined)
+      form.setFieldValue("date", undefined);
     }
   };
   const filterStatitic = (e) => {
-    console.log(e);
     let filter = {
-      filter: 'day',
-      startTime: undefined,
-      endTime: undefined,
+      filter: "day",
+      start_date: undefined,
+      end_date: undefined,
       status: undefined,
-    }
-    if(e.typeDate === 'day') {
-      console.log(e.date[0], dayjs(e.date[0]).format('YYYY-MM-DD'))
+    };
+    if (e.typeDate === "day") {
       filter = {
         ...filter,
-        startTime: dayjs(e.date[0]).format('YYYY-MM-DD'),
-        endTime: dayjs(e.date[1]).format('YYYY-MM-DD')
-      }
-    } else if (e.typeDate === 'month') {
+        start_date: dayjs(e.date[0]).format("YYYY-MM-DD"),
+        end_date: dayjs(e.date[1]).format("YYYY-MM-DD"),
+      };
+    } else if (e.typeDate === "month") {
       filter = {
         ...filter,
-        startTime: dayjs(e.date).format('YYYY-MM'),
-        endTime: undefined
-      }
+        start_date: dayjs(e.date[0]).format("YYYY-MM"),
+        end_date: undefined,
+      };
     } else {
       filter = {
-      ...filter,
-      startTime: dayjs(e.date).format('YYYY'),
-      endTime: undefined
+        ...filter,
+        start_date: dayjs(e.date[0]).format("YYYY"),
+        end_date: undefined,
+      };
     }
-    }
-    console.log(filter);
     setDataSort({
       ...filter,
-      filter: e.typeDate
-    })
-  }
+      filter: e.typeDate,
+    });
+  };
+
+  const columns = useMemo(() => {
+    return [
+      {
+        title: "Sản Phẩm",
+        render: (_, record) => (
+          <div className="flex items-center space-x-4">
+            <Image
+              src={record.image_master}
+              alt=""
+              className="max-w-[100px] min-w-[100px] min-h-[100px] max-h-[100px] rounded-[6px]"
+            />
+            <div className="max-w-[200px]">{record?.name}</div>
+            <div>
+              <span className="block text-[12px] text-[#999] italic">
+                Thể Loại
+              </span>
+              <span>{record?.category?.name}</span>
+            </div>
+          </div>
+        ),
+      },
+      {
+        title: "Chi tiết",
+        render: (_, record) => (
+          <div
+            className="max-w-[200px] max-h-[100px] overflow-auto"
+            dangerouslySetInnerHTML={{ __html: record.description }}
+          />
+        ),
+      },
+      {
+        title: "Đơn Giá",
+        render: (_, record) => <span>{formatMoney(record.price)} đ</span>,
+      },
+      {
+        title: "Số Lượng",
+        align: "center",
+        dataIndex: "quantity",
+      },
+    ];
+  }, []);
+  const filterStaticProduct = async (e) => {
+    try {
+      await statiticProductData({
+        start_date: dayjs(e.date[0]).format("YYYY-MM-DD"),
+        end_date: dayjs(e.date[1]).format("YYYY-MM-DD"),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-[30px] font-bold">THỐNG KÊ ADMIN</h1>
@@ -314,7 +409,12 @@ export default function Home() {
           </Row>
           <Divider />
           <div className="font-bold text-[22px] mb-5">Thống kê đơn hàng</div>
-          <Form className="mb-5" form={form} onFinish={filterStatitic} onValuesChange={onValuesChange}>
+          <Form
+            className="mb-5"
+            form={form}
+            onFinish={filterStatitic}
+            onValuesChange={onValuesChange}
+          >
             <Space>
               <Form.Item name="typeDate">
                 <Select
@@ -332,7 +432,10 @@ export default function Home() {
                   size="large"
                 />
               </Form.Item>
-              <Form.Item name="date" rules={[{required: true, message: 'Vui lòng nhập thời gian'}]}>
+              <Form.Item
+                name="date"
+                rules={[{ required: true, message: "Vui lòng nhập thời gian" }]}
+              >
                 {typeDate === "day" && <RangePicker size="large" />}
                 {typeDate === "mounth" && (
                   <DatePicker picker="month" size="large" />
@@ -342,14 +445,14 @@ export default function Home() {
                 )}
               </Form.Item>
               <Form.Item>
-              <Button
-                size="large"
-                type="primary"
-                className="!px-10"
-                htmlType="submit"
-              >
-                Lọc
-              </Button>
+                <Button
+                  size="large"
+                  type="primary"
+                  className="!px-10"
+                  htmlType="submit"
+                >
+                  Lọc
+                </Button>
               </Form.Item>
             </Space>
           </Form>
@@ -388,6 +491,40 @@ export default function Home() {
               fill="url(#colorPv)"
             />
           </AreaChart>
+          <Divider />
+          <h3>Thể Loại Bán Chạy</h3>
+          <BarChart width={1000} height={350} data={statiticCateories}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="quantity" fill="#8884d8" />
+          </BarChart>
+          <Divider />
+          <h3>Sản Phẩm Không Tồn Kho</h3>
+          <div className="flex justify-end">
+            <Form form={formFilterProduct} onFinish={filterStaticProduct}>
+              <Space>
+                <Form.Item name="date">
+                  <RangePicker size="large" />
+                </Form.Item>
+                <Form.Item>
+                  <Button
+                    size="large"
+                    type="primary"
+                    className="!px-10"
+                    htmlType="submit"
+                  >
+                    Lọc
+                  </Button>
+                </Form.Item>
+              </Space>
+            </Form>
+          </div>
+          <div className="w-full">
+            <Table columns={columns} dataSource={statiticProduct} />
+          </div>
         </>
       )}
     </div>
