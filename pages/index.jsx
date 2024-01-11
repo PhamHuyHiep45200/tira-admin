@@ -1,5 +1,22 @@
+import {
+  STATUS_CANCEL,
+  STATUS_DELIVERING,
+  STATUS_ORDERED,
+  STATUS_PAYMENT_SUCCESS,
+  STATUS_SUCCESS,
+} from "@/enum/order.enum";
 import { statistics } from "@/service/user";
-import { Col, Divider, Form, Row, Select, Space } from "antd";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Divider,
+  Form,
+  Row,
+  Select,
+  Space,
+} from "antd";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import {
   Area,
@@ -17,9 +34,48 @@ import {
   YAxis,
 } from "recharts";
 
+import dayjs from 'dayjs'
+
+const { RangePicker } = DatePicker;
+
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-const productStatitic = ["", "", "", ""];
-const orderStatitic = [""];
+const optionsDate = [
+  {
+    label: "Ngày",
+    value: "day",
+  },
+  {
+    label: "Tháng",
+    value: "mounth",
+  },
+  {
+    label: "Năm",
+    value: "year",
+  },
+];
+
+const optionsOrder = [
+  {
+    value: STATUS_ORDERED,
+    label: "Đặt hàng Chưa thanh toán",
+  },
+  {
+    value: STATUS_DELIVERING,
+    label: "Đang giao",
+  },
+  {
+    value: STATUS_PAYMENT_SUCCESS,
+    label: "Thanh toán thành công",
+  },
+  {
+    value: STATUS_SUCCESS,
+    label: "Giao hàng thành công",
+  },
+  {
+    value: STATUS_CANCEL,
+    label: "Huỷ",
+  },
+];
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({
@@ -30,6 +86,7 @@ const renderCustomizedLabel = ({
   outerRadius,
   percent,
   index,
+  value,
 }) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -43,7 +100,7 @@ const renderCustomizedLabel = ({
       textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
     >
-      {`${(percent * 100).toFixed(0)}%`}
+      {value}
     </text>
   );
 };
@@ -85,18 +142,29 @@ const data = [
   },
 ];
 export default function Home() {
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState();
   const [orderFilter, setOrderFilter] = useState();
   const [product, setProduct] = useState();
+  const [typeDate, setTypeDate] = useState("day");
+  const [dataSort, setDataSort] = useState({
+    filter: 'day',
+    startTime: undefined,
+    endTime: undefined,
+    status: undefined,
+  })
 
   useEffect(() => {
     getStatistics();
-  }, []);
+    form.setFieldsValue({
+      typeDate: "day",
+    });
+  }, [dataSort]);
 
   const getStatistics = async () => {
     try {
-      const { orderCount, orderFilter, productCount } = await statistics();
+      const { orderCount, orderFilter, productCount } = await statistics(dataSort);
       setOrder(
         Object.entries(orderCount).map((e) => ({
           name: e[0],
@@ -122,6 +190,46 @@ export default function Home() {
       setLoading(false);
     }
   };
+  const onValuesChange = (e, a) => {
+    if (Object.keys(e)[0] === "typeDate") {
+      setTypeDate(e.typeDate);
+      form.setFieldValue('date', undefined)
+    }
+  };
+  const filterStatitic = (e) => {
+    console.log(e);
+    let filter = {
+      filter: 'day',
+      startTime: undefined,
+      endTime: undefined,
+      status: undefined,
+    }
+    if(e.typeDate === 'day') {
+      console.log(e.date[0], dayjs(e.date[0]).format('YYYY-MM-DD'))
+      filter = {
+        ...filter,
+        startTime: dayjs(e.date[0]).format('YYYY-MM-DD'),
+        endTime: dayjs(e.date[1]).format('YYYY-MM-DD')
+      }
+    } else if (e.typeDate === 'month') {
+      filter = {
+        ...filter,
+        startTime: dayjs(e.date).format('YYYY-MM'),
+        endTime: undefined
+      }
+    } else {
+      filter = {
+      ...filter,
+      startTime: dayjs(e.date).format('YYYY'),
+      endTime: undefined
+    }
+    }
+    console.log(filter);
+    setDataSort({
+      ...filter,
+      filter: e.typeDate
+    })
+  }
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-[30px] font-bold">THỐNG KÊ ADMIN</h1>
@@ -167,7 +275,7 @@ export default function Home() {
               </div>
             </Col>
             <Col className="flex flex-col justify-start">
-            <div className="text-center">Thống kê order</div>
+              <div className="text-center">Thống kê order</div>
               <div className="flex items-center">
                 <PieChart width={400} height={400}>
                   <Pie
@@ -205,18 +313,46 @@ export default function Home() {
             </Col>
           </Row>
           <Divider />
-          {/* <Form>
-            <Form.Item>
-            <Select
-              mode="tags"
-              style={{ width: "100%" }}
-              placeholder="Tags Mode"
-              onChange={handleChange}
-              options={options}
-            />
-            </Form.Item>
-          </Form> */}
-          <div>Thống kê đơn hàng</div>
+          <div className="font-bold text-[22px] mb-5">Thống kê đơn hàng</div>
+          <Form className="mb-5" form={form} onFinish={filterStatitic} onValuesChange={onValuesChange}>
+            <Space>
+              <Form.Item name="typeDate">
+                <Select
+                  style={{ width: "150px" }}
+                  placeholder="Thời gian"
+                  options={optionsDate}
+                  size="large"
+                />
+              </Form.Item>
+              <Form.Item name="status">
+                <Select
+                  style={{ width: "250px" }}
+                  placeholder="Trạng thái"
+                  options={optionsOrder}
+                  size="large"
+                />
+              </Form.Item>
+              <Form.Item name="date" rules={[{required: true, message: 'Vui lòng nhập thời gian'}]}>
+                {typeDate === "day" && <RangePicker size="large" />}
+                {typeDate === "mounth" && (
+                  <DatePicker picker="month" size="large" />
+                )}
+                {typeDate === "year" && (
+                  <DatePicker size="large" picker="year" />
+                )}
+              </Form.Item>
+              <Form.Item>
+              <Button
+                size="large"
+                type="primary"
+                className="!px-10"
+                htmlType="submit"
+              >
+                Lọc
+              </Button>
+              </Form.Item>
+            </Space>
+          </Form>
           <AreaChart
             width={1000}
             height={250}

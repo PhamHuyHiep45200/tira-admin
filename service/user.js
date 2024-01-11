@@ -35,8 +35,9 @@ export async function deleteUser(id) {
   });
 }
 
-export async function statistics() {
+export async function statistics(params) {
   return request(`/statistics/statistics`, {
     method: "GET",
+    params
   });
 }
